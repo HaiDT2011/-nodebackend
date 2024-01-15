@@ -24,4 +24,4 @@ var ketTokenSchema = new Schema({
 });
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, ketTokenSchema);
+module.exports = model(DOCUMENT_NAME, ketTokenSchema);

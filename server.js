@@ -1,7 +1,9 @@
-const { configDotenv } = require("dotenv");
-const app = require("./src/app");
 
+const app = require("./src/app");
+require('dotenv').config();
 const PORT = process.env.PORT
+
+console.log('========>PORT',PORT)
 
 const server = app.listen(PORT, () => {
   console.log("handle connect port");

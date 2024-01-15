@@ -18,4 +18,4 @@ class KeyTokenService {
   };
 }
 
-module.exports = KeyTokenService;
+module.exports = new KeyTokenService();

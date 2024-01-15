@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUntils");
-const { userInfo } = require("os");
 
 const RoleShop = {
   SHOP: "SHOP",
@@ -18,16 +17,14 @@ class AccessSerice {
   static signUp = async ({ name, email, pass }) => {
     try {
       //step1: check mail exist
-      const holderShop = await shopModel
-        .findOne({
-          email,
-        })
-        .lean();
+      // debugger
+      const holderShop = await shopModel.findOne({email}).lean()
 
       if (!holderShop) {
         return {
           code: "xxx",
           message: "Shop already register",
+          status: 'error'
         };
       }
 
@@ -44,12 +41,13 @@ class AccessSerice {
         const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
           modulusLength: 4096,
         });
+
+        console.log({ privateKey, publicKey });  // save collection KeyStore
+
         const publicKeyString = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
         });
-
-        console.log({ privateKey, publicKey });  // save collection KeyStore
 
         if (!publicKeyString) {
           return {
@@ -58,16 +56,16 @@ class AccessSerice {
           };
         }
         // create tken pair
-        const tokens = await createTokenPair(
-          {
-            userId: newShop._id,
-            email,
-          },
-          publicKey,
-          privateKey
-        );
+        // const tokens = await createTokenPair(
+        //   {
+        //     userId: newShop._id,
+        //     email,
+        //   },
+        //   publicKey,
+        //   privateKey
+        // );
 
-        console.log("========>tokens", tokens);
+        // console.log("========>tokens", tokens);
 
         return {
           code: 201,
@@ -90,3 +88,5 @@ class AccessSerice {
     }
   };
 }
+
+module.exports = AccessSerice

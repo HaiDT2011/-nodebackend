@@ -1,26 +1,45 @@
 "use strict";
 
 const { Schema, model } = require("mongoose"); // Erase if already required
-const DOCUMENT_NAME = 'Key'
-const COLLECTION_NAME = 'Keys'
+const DOCUMENT_NAME = 'Shop'
+const COLLECTION_NAME = 'Shops'
 
-var shop = new Schema({
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    pass: {
-      type: String,
-      required: true,
-    },
-  },{
-      collection: COLLECTION_NAME,
-      timestamps: true
-  });
-  
-  //Export the model
-  module.exports = mongoose.model(DOCUMENT_NAME, shop);
+
+// Declare the Schema of the Mongo model
+var shopSchema = new Schema({
+  name: {
+    type: String,
+    maxLength: 150,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    // required: true,
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'inactive'
+  },
+  verfify: {
+    type: Schema.Types.Boolean,
+    default: false
+  },
+  roles: {
+    type: Array,
+    default: []
+  }
+}, {
+  timestamps: true,
+  collection: COLLECTION_NAME
+});
+
+
+//Export the model
+module.exports = model(DOCUMENT_NAME, shopSchema);
