@@ -5,6 +5,7 @@ const accessController = require('../../controllers/access.controller');
 
 const route = express.Router();
 
+
 // signUp
 
 route.post('/shop/signup', accessController.signUp)

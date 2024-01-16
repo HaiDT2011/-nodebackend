@@ -6,7 +6,7 @@ const COLLECTION_NAME = 'Shops'
 
 
 // Declare the Schema of the Mongo model
-var shopSchema = new Schema({
+const shopSchema = new Schema({
   name: {
     type: String,
     maxLength: 150,
@@ -14,13 +14,12 @@ var shopSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
     unique: true,
     trim: true
   },
   password: {
     type: String,
-    // required: true,
+    required: true,
   },
   status: {
     type: String,
