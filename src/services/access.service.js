@@ -32,7 +32,7 @@ class AccessSerice {
     const matchPass = bcrypt.compare(password, foundShop.password)
 
     if(!matchPass){
-
+      throw new BadRequestError('Shop not register')
     }
   }
 
