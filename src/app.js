@@ -18,12 +18,26 @@ app.use(compression())
 
 require('./dbs/init.mongodb')
 
-const {countConnect} = require('./helpers/check.connect')
+const { countConnect } = require('./helpers/check.connect')
 
 //init routes
 
-app.use(express.json()) 
-app.use('/',require('./routes'))
+app.use(express.json())
+app.use('/', require('./routes'))
+
+app.use((req, res, next) => {
+  const error = new Error('Not Found')
+  next(error)
+})
+
+app.use((err, req, res, next) => {
+  const statusCode = err.status || 500
+  return res.status(statusCode).json({
+    stauts: 'error',
+    code: statusCode,
+    message: err.message || 'Internal Server Error'
+  })
+})
 
 //handle error
 

@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUntils");
 const { BadRequestError } = require("../core/error.res");
+const { findByEmail } = require("./shop.service");
 
 const RoleShop = {
   SHOP: "SHOP",
@@ -15,13 +16,32 @@ const RoleShop = {
 };
 
 class AccessSerice {
+
+  static login = async ({email, password, refreshToken }) => {
+    //check email in dbs
+    //match password
+    //create AT, RefToken
+    // generate tokens
+    // get login
+
+    const foundShop = await findByEmail({email})
+    if(!foundShop){
+      throw new BadRequestError('Shop not register')
+    }
+
+    const matchPass = bcrypt.compare(password, foundShop.password)
+
+    if(!matchPass){
+
+    }
+  }
+
   static signUp = async ({ name, email, password }) => {
-    try {
+    // try {
       //step1: check mail exist
       const holderShop = await shopModel.findOne({ email }).lean();
-      console.log("===========>holderShop", holderShop);
       if (holderShop) {
-        throw BadRequestError("Erro: Shop");
+          throw new BadRequestError("Error: Shop 1",403)
       }
       const passwordHash = await bcrypt.hash(password, 10);
       const newShop = await shopModel.create({
@@ -46,7 +66,7 @@ class AccessSerice {
         // });
         const privateKey = crypto.randomBytes(64).toString("hex");
         const publicKey = crypto.randomBytes(64).toString("hex");
-        console.log({ privateKey, publicKey }); // save collection KeyStore
+        // console.log({ privateKey, publicKey }); // save collection KeyStore
 
         const keyStore = await KeyTokenService.createKeyToken({
           userId: newShop._id,
@@ -57,10 +77,7 @@ class AccessSerice {
         // const publicKeyObject = crypto.createPublicKey(publicKeyString);
 
         if (!keyStore) {
-          return {
-            code: "xxxx",
-            message: "error",
-          };
+          throw new BadRequestError("Error: Shop 2",403)
         }
         // create token pair
         const tokens = await createTokenPair(
@@ -84,13 +101,13 @@ class AccessSerice {
         code: 200,
         metadata: null,
       };
-    } catch (error) {
-      return {
-        code: "xxx",
-        message: error.message,
-        status: "error",
-      };
-    }
+    // } catch (error) {
+    //   return {
+    //     code: "xxx",
+    //     message: error.message,
+    //     status: "error",
+    //   };
+    // }
   };
 }
 

@@ -3,10 +3,9 @@
 
 POST http://localhost:3055/v1/api/shop/signup
 Content-Type: application/json
-x-api-key: 'aaaaaaaaa'
 
 {
-  "name": "Shaip",
-  "email": "shtddtine@gmail.com",
-  "password": "abcff1dfdf24"
+  "name": "rfededee5dd",
+  "email": "sdieed1eew@gmaildd.com",
+  "password": "abfggdddf24"
 }
