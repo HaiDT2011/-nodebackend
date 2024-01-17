@@ -3,9 +3,9 @@
 
 POST http://localhost:3055/v1/api/shop/login
 Content-Type: application/json
-x-api-key: b12fa5da2c53a229067c72903e0371de9c42416a0414017a56658443b3884cd50873e5ee09ad9578a6d1ab3ada253617ba061a4277439952d3e9c7907f4c6533
+x-api-key: 6b65c6acfc25910f5605841121286386b0e3ae9e4eb1dfb2dd40c78e1f47efda7faee291be6050519bd99e05d32446c7aee6cfc96e25396832b3b67fae720870
 
 {
-  "email": "dungbk@gmail.com",
-  "password": "Dun"
+  "email": "haibk20112582@gmail.com",
+  "password": "Haibk2011@"
 }

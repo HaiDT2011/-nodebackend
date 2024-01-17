@@ -4,9 +4,10 @@ const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/authUntils");
-const { BadRequestError, AuthFailureError } = require("../core/error.res");
+const { createTokenPair, virifityJWT } = require("../auth/authUntils");
+const { BadRequestError, AuthFailureError, FORBIDDENEROR } = require("../core/error.res");
 const { findByEmail } = require("./shop.service");
+const { constants } = require("buffer");
 
 const RoleShop = {
   SHOP: "SHOP",
@@ -17,8 +18,57 @@ const RoleShop = {
 
 class AccessSerice {
 
-  static logout = async({keyStore}) => {
-    return KeyTokenService.removeKeyById(keyStore)
+  static handleRefreshToken = async ({refreshToken}) => {
+    const foundToken = await KeyTokenService.findByRefreshTokenUser(refreshToken)
+
+    if (foundToken) {
+      // decode
+      const { userId, email } = await virifityJWT(refreshToken, foundToken.privateKey)
+      //xóa
+      await KeyTokenService.removeKeyById({ id: userId })
+
+      throw new FORBIDDENEROR('Something ')
+    }
+
+    const holderToken = await KeyTokenService.findByRefreshToken( refreshToken )
+
+    if (!holderToken) throw new AuthFailureError('Shop not registeted')
+
+    //verifity token
+
+    const { userId, email } = await virifityJWT(refreshToken, holderToken)
+
+    //checl userID 
+
+    const foundShop = await findByEmail({ email })
+
+    if (!foundShop) throw new AuthFailureError('Shop not registeted')
+
+    // create token 
+    const tokens = await createTokenPair(
+      {
+        userId,
+        email,
+      },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+    await holderToken.updated({
+      $set: {
+        refreshToken: tokens.refreshToken
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken
+      }
+    })
+    return {
+      user: { userId, email },
+      tokens
+    }
+  }
+
+  static logout = async (keyStore) => {
+    return KeyTokenService.removeKeyById({ id: keyStore._id })
   }
 
   static login = async ({ email, password, refreshToken }) => {
@@ -115,8 +165,6 @@ class AccessSerice {
       if (!keyStore) {
         throw new BadRequestError("Error: Shop 2", 403);
       }
-
-      console.log("===========>", tokens);
 
       return {
         code: 201,

@@ -29,7 +29,7 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
   }
 };
 
-const  authentication = asyncHander(async (req, res, next) => {
+const authentication = asyncHander(async (req, res, next) => {
   //1 - check userId missing
   //2- get access token
   //3- verityfi token
@@ -47,15 +47,20 @@ const  authentication = asyncHander(async (req, res, next) => {
 
   try {
     const decodeUser = JWT.verify(accessToken, keyStore?.publicKey);
-    if (userId !== decodeUser.userId) {
-      throw new AuthFailureError("Invalid User");
-    }
-
+    if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid User");
     req.keyStore = keyStore;
-  } catch (error) {}
+    return next()
+  } catch (error) {
+    console.log('==========>NotFoundError', error)
+  }
 });
+
+const virifityJWT = async (token, keySecret) => {
+  return JWT.verify(token, keySecret)
+}
 
 module.exports = {
   createTokenPair,
-  authentication
+  authentication,
+  virifityJWT
 };
