@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 
-const connectString = "mongodb://localhost:27017/habk";
+const connectString = "mongodb://localhost:27017/database_shop";
 
 class Database {
   constructor() {

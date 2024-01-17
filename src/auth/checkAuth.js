@@ -34,9 +34,10 @@ const apiKey = async (req, res, next) => {
 
 const permission = (permissions) => {
   return (req, res, next) => {
-    if (!req.objKey.permissions || req.objKey.permissions.includes(permissions)) {
+    if (!req?.objKey?.permissions?.includes(permissions)) {
       return res.status(403).json({
         message: "permission denied",
+        status: 403
       });
     }
 

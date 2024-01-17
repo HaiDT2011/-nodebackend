@@ -20,9 +20,13 @@ const ketTokenSchema = new Schema(
       required: true,
     },
 
-    refreshToken: {
-      type: Array,
+    refreshTokensUsed: {
+      type: Array, // nhung RT da duoc su dung
       default: [],
+    },
+    refreshToken: {
+      type: String,
+      require: true,
     },
   },
   {

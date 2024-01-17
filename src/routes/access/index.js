@@ -1,14 +1,21 @@
 "use strict";
 
-const express = require('express');
-const { asyncHander } = require('../../auth/checkError');
-const accessController = require('../../controllers/access.controller');
+const express = require("express");
+const { asyncHander } = require("../../helpers/checkError");
+const accessController = require("../../controllers/access.controller");
+const { authentication } = require("../../auth/authUntils");
 
 const route = express.Router();
-
+// login
+route.post("/shop/login", asyncHander(accessController.login));
 
 // signUp
 
-route.post('/shop/signup', asyncHander(accessController.signUp))
+route.post("/shop/signup", asyncHander(accessController.signUp));
 
-module.exports = route
+//authentication//
+
+route.use(authentication);
+//logout
+route.post("/shop/signup", asyncHander(accessController.logout));
+module.exports = route;
