@@ -30,11 +30,6 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 };
 
 const authentication = asyncHander(async (req, res, next) => {
-  //1 - check userId missing
-  //2- get access token
-  //3- verityfi token
-  //4- check userID
-  //5- check keyStore with this userID
 
   const userId = req.headers["x-client-id"];
   if (!userId) throw new AuthFailureError("Invalid Request");
@@ -42,25 +37,26 @@ const authentication = asyncHander(async (req, res, next) => {
   const keyStore = await findByUserId({ userId });
   if (!keyStore) throw new NotFoundError("Not Found Error");
 
-  const accessToken = req.headers["athorization"];
-  if (!accessToken) throw new AuthFailureError("Invalid Request");
-
-  try {
-    const decodeUser = JWT.verify(accessToken, keyStore?.publicKey);
-    if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid User");
-    req.keyStore = keyStore;
-    return next()
-  } catch (error) {
-    console.log('==========>NotFoundError', error)
+  if (req.headers["refrestoken"]) {
+    try {
+      const decodeUser = JWT.verify(req.headers["refrestoken"]               , keyStore?.privateKey);
+      if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid User");
+      req.keyStore = keyStore;
+      req.user = decodeUser;
+      req.refreshToken = req.headers["refrestoken"];
+      return next();
+    } catch (error) {
+      console.log("==========>NotFoundError", error);
+    }
   }
 });
 
 const virifityJWT = async (token, keySecret) => {
-  return JWT.verify(token, keySecret)
-}
+  return JWT.verify(token, keySecret);
+};
 
 module.exports = {
   createTokenPair,
   authentication,
-  virifityJWT
+  virifityJWT,
 };

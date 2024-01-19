@@ -12,4 +12,6 @@ route.use(apiKey);
 //
 route.use("/v1/api", require("./access/index"));
 
+route.use("/v1/api", require("./product/index"));
+
 module.exports = route;

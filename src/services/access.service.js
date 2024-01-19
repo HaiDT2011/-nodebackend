@@ -5,7 +5,11 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair, virifityJWT } = require("../auth/authUntils");
-const { BadRequestError, AuthFailureError, FORBIDDENEROR } = require("../core/error.res");
+const {
+  BadRequestError,
+  AuthFailureError,
+  FORBIDDENEROR,
+} = require("../core/error.res");
 const { findByEmail } = require("./shop.service");
 const { constants } = require("buffer");
 
@@ -17,34 +21,27 @@ const RoleShop = {
 };
 
 class AccessSerice {
+  static handleRefreshToken = async ({ refreshToken, user, keyStore }) => {
+    const { userId, email } = user;
 
-  static handleRefreshToken = async ({refreshToken}) => {
-    const foundToken = await KeyTokenService.findByRefreshTokenUser(refreshToken)
-
-    if (foundToken) {
-      // decode
-      const { userId, email } = await virifityJWT(refreshToken, foundToken.privateKey)
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       //xóa
-      await KeyTokenService.removeKeyById({ id: userId })
+      await KeyTokenService.removeKeyById({ id: userId });
 
-      throw new FORBIDDENEROR('Something ')
+      throw new FORBIDDENEROR("Something ");
     }
 
-    const holderToken = await KeyTokenService.findByRefreshToken( refreshToken )
+    if(keyStore.refreshToken !== refreshToken){
+      throw new AuthFailureError("Shop not registeted");
+    }
 
-    if (!holderToken) throw new AuthFailureError('Shop not registeted')
+    //checl userID
 
-    //verifity token
+    const foundShop = await findByEmail({ email });
 
-    const { userId, email } = await virifityJWT(refreshToken, holderToken)
+    if (!foundShop) throw new AuthFailureError("Shop not registeted");
 
-    //checl userID 
-
-    const foundShop = await findByEmail({ email })
-
-    if (!foundShop) throw new AuthFailureError('Shop not registeted')
-
-    // create token 
+    // create token
     const tokens = await createTokenPair(
       {
         userId,
@@ -53,23 +50,23 @@ class AccessSerice {
       holderToken.publicKey,
       holderToken.privateKey
     );
-    await holderToken.updated({
+    await keyStore.updated({
       $set: {
-        refreshToken: tokens.refreshToken
+        refreshToken: tokens.refreshToken,
       },
       $addToSet: {
-        refreshTokensUsed: refreshToken
-      }
-    })
+        refreshTokensUsed: refreshToken,
+      },
+    });
     return {
       user: { userId, email },
-      tokens
-    }
-  }
+      tokens,
+    };
+  };
 
   static logout = async (keyStore) => {
-    return KeyTokenService.removeKeyById({ id: keyStore._id })
-  }
+    return KeyTokenService.removeKeyById({ id: keyStore._id });
+  };
 
   static login = async ({ email, password, refreshToken }) => {
     //check email in dbs
@@ -157,7 +154,7 @@ class AccessSerice {
         userId: newShop._id,
         publicKey,
         privateKey,
-        refreshToken: tokens.refreshToken
+        refreshToken: tokens.refreshToken,
       });
 
       // const publicKeyObject = crypto.createPublicKey(publicKeyString);

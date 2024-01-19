@@ -6,7 +6,7 @@ const COLLECTION_NAME = "Products";
 
 
 // Declare the Schema of the Mongo model
-var productSchema = new Schema({
+const productSchema = new Schema({
   product_name: {
     type: String,
     required: true,
@@ -16,6 +16,9 @@ var productSchema = new Schema({
     required: true,
   },
   product_description: {
+    type: String,
+  },
+  product_slug: {
     type: String,
   },
   product_price: {
@@ -33,12 +36,37 @@ var productSchema = new Schema({
   },
   product_shop: {
     type: Schema.Types.ObjectId,
-    ref:'Shop'
+    ref: 'Shop'
   },
   product_attributes: {
     type: Schema.Types.Mixed,
     required: true,
   },
+  //more
+  product_ratingsAverage: {
+    type: Number,
+    default: 4.5,
+    min: [1, 'Rating must be above 1.0'],
+    min: [5, 'Rating must be above 5.0'],
+    set: (val) => Math.round(val * 10) / 10,
+    required: true,
+  },
+  product_variations: {
+    type: Array,
+    default: []
+  },
+  isDraft: {
+    type: Boolean,
+    default: true,
+    index: true,
+    select: false
+  },
+  isPublished :{
+    type: Boolean,
+    default: false,
+    index: true,
+    select: false
+  }
 }, {
   timestamps: true,
   collection: COLLECTION_NAME
@@ -53,23 +81,27 @@ const clothingSchema = new Schema({
   metarial: String
 }, {
   timestamps: true,
-  collection: COLLECTION_NAME
+  collection: "clothing"
 })
 
 // define the product type = electronics
 
 const electronicsSchema = new Schema({
   manufactuere: { type: String, require: true },
+  product_shop: {
+    type: Schema.Types.ObjectId,
+    ref: 'Shop'
+  },
   model: String,
   color: String
 }, {
   timestamps: true,
-  collection: COLLECTION_NAME
+  collection: "electronic"
 })
 
 //Export the model
 module.exports = {
-  pruduct: model(DOCUMENT_NAME, productSchema),
-  clothing: model('Clothing', clothingSchema),
-  clothing: model('Electronics', electronicsSchema),
+  product: model(DOCUMENT_NAME, productSchema),
+  clothing: model('Clothings', clothingSchema),
+  electronics: model('Electronics', electronicsSchema),
 }
