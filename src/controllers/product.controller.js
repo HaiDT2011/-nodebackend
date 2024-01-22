@@ -16,6 +16,20 @@ class ProductController {
 
   };
 
+  getAllDraftsForShop = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'get data OK',
+      metadata: await ProductFactory.findAllDraftsForShop({product_shop:req.user.userId})
+    }).send(res)
+  }
+
+  putPublish = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'get data OK',
+      metadata: await ProductFactory.publishProductByShop({product_shop:req.user.userId})
+    }).send(res)
+  }
+
 }
 
 module.exports = new ProductController();

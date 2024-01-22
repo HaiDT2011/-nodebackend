@@ -10,5 +10,7 @@ const route = express.Router();
 route.use(authentication);
 
 route.post("/product", asyncHander(productController.createProduct));
+route.get("/product/draf/all", asyncHander(productController.getAllDraftsForShop));
+route.get("/product/publish/all", asyncHander(productController.getAllDraftsForShop));
 
 module.exports = route;

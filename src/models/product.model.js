@@ -3,7 +3,7 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
-
+const slugify = require("slugify")
 
 // Declare the Schema of the Mongo model
 const productSchema = new Schema({
@@ -47,7 +47,7 @@ const productSchema = new Schema({
     type: Number,
     default: 4.5,
     min: [1, 'Rating must be above 1.0'],
-    min: [5, 'Rating must be above 5.0'],
+    max: [5, 'Rating must be above 5.0'],
     set: (val) => Math.round(val * 10) / 10,
     required: true,
   },
@@ -61,7 +61,7 @@ const productSchema = new Schema({
     index: true,
     select: false
   },
-  isPublished :{
+  isPublished: {
     type: Boolean,
     default: false,
     index: true,
@@ -82,6 +82,13 @@ const clothingSchema = new Schema({
 }, {
   timestamps: true,
   collection: "clothing"
+})
+
+//Document middleware : run before .save() .create()
+
+productSchema.pre('save', function (next) {
+  this.product_slug = slugify(this.product_description, { lower: true })
+  next()
 })
 
 // define the product type = electronics
