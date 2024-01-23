@@ -106,6 +106,10 @@ const electronicsSchema = new Schema({
   collection: "electronic"
 })
 
+// define the product index type = clothing
+productSchema.index({product_name: 'text', product_description:'text'})
+
+
 //Export the model
 module.exports = {
   product: model(DOCUMENT_NAME, productSchema),

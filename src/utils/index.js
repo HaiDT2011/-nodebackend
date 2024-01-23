@@ -11,6 +11,26 @@ const getIntoData = (filed = [], object = Object) => {
   return dataObjectConvert;
 };
 
+const getSelectData = (select = []) => {
+  return Object.fromEntries(select.map(el => [el, 1]))
+}
+
+const getUnSelectData = (select = []) => {
+  return Object.fromEntries(select.map(el => [el, 0]))
+}
+
+const removeUndefinedObject = obj => {
+  Object.keys(object).forEach((value) => {
+    if(!obj[value]){
+      delete obj[value]
+    }
+  })
+  return obj
+}
+
 module.exports = {
-    getIntoData
+  getIntoData,
+  getSelectData,
+  getUnSelectData,
+  removeUndefinedObject
 }
