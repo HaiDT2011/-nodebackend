@@ -2,6 +2,7 @@
 
 const { BadRequestError } = require("../core/error.res");
 const { product, clothing, electronics } = require("../models/product.model");
+const { insertInventories } = require("../models/repositories/inventory.repo");
 const {
   findAllDraftsForShop,
   publishProductByShop,
@@ -57,17 +58,27 @@ class ProductFactory {
   }
 
   static async searchProductByUser({ keySearch }) {
-    return await searchProductByUser({ keySearch })
+    return await searchProductByUser({ keySearch });
   }
 
-  static async findAllProduct({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true }, }) {
-    return await findAllProduct({ limit, sort, page, filter, select: ['product_name', 'product_price', 'product_thumb'] })
+  static async findAllProduct({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+    filter = { isPublished: true },
+  }) {
+    return await findAllProduct({
+      limit,
+      sort,
+      page,
+      filter,
+      select: ["product_name", "product_price", "product_thumb"],
+    });
   }
 
   static async findOneProduct({ product_id }) {
-    return await findOneProduct({ product_id, unSelect: ['__v'] })
+    return await findOneProduct({ product_id, unSelect: ["__v"] });
   }
-
 }
 
 // define base product class
@@ -93,14 +104,31 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return await product.create({
+    const productNew = await product.create({
       ...this,
       _id: product_id,
     });
+
+    if (!productNew) throw BadRequestError("create product error");
+
+    const inventory = await createInventories({
+      inven_productId: productNew._id,
+      inven_stock: this.prodcut_quantity,
+      iven_shopId: this.product_shop,
+    });
+
+    if (!inventory) throw BadRequestError("create inventory error");
+    
+    return product;
   }
 
   async updateProduct(product_id, payload) {
-    return findByIdUpdateProduct({ product_id, payload, model: product, isNew: true })
+    return findByIdUpdateProduct({
+      product_id,
+      payload,
+      model: product,
+      isNew: true,
+    });
   }
 }
 
@@ -123,11 +151,16 @@ class Clothing extends Product {
   async updateProduct(product_id) {
     // remove atribute has null and underfined
     // check update o cho nao
-    const objectPrams = removeUndefinedObject(this)
+    const objectPrams = removeUndefinedObject(this);
     if (objectPrams.product_attributes) {
-      findByIdUpdateProduct({ product_id, objectPrams, model: clothing, isNew: true })
+      findByIdUpdateProduct({
+        product_id,
+        objectPrams,
+        model: clothing,
+        isNew: true,
+      });
     }
-    const updateProduct = await super.updateProduct()
+    const updateProduct = await super.updateProduct();
     if (!updateProduct) throw BadRequestError("update product error");
   }
 }
