@@ -1,5 +1,7 @@
 "use strict";
 
+const { Schema } = require("mongoose");
+
 const getIntoData = (filed = [], object = Object) => {
   let dataObjectConvert = {};
 
@@ -19,6 +21,10 @@ const getUnSelectData = (select = []) => {
   return Object.fromEntries(select.map(el => [el, 0]))
 }
 
+const convertToObjectDB = id => {
+  return Schema.Types.ObjectId(id)
+}
+
 const removeUndefinedObject = obj => {
   Object.keys(object).forEach((value) => {
     if(!obj[value]){
@@ -32,5 +38,6 @@ module.exports = {
   getIntoData,
   getSelectData,
   getUnSelectData,
-  removeUndefinedObject
+  removeUndefinedObject,
+  convertToObjectDB
 }

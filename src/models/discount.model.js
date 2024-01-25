@@ -34,6 +34,10 @@ const discountSchema = new Schema(
       type: Date,
       required: true,
     },
+    discount_max_value: {
+      type: Number,
+      required: true,
+    },
     discount_max_use: {
       type: Number,
       required: true,
@@ -68,9 +72,9 @@ const discountSchema = new Schema(
       enum: ["all", "speccific"],
     },
     discount_product_ids: {
-        type: Array,
-        default: [],
-      },
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,
